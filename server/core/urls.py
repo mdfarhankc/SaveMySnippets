@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
+from django.http import JsonResponse
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView,
@@ -8,6 +9,7 @@ from drf_spectacular.views import (
 )
 
 urlpatterns = [
+    path("", lambda r: JsonResponse({"status": "ok", "service": "SaveMySnippets API"})),
     path("admin/", admin.site.urls),
     # Local urls
     path('api/auth/', include('accounts.urls')),
