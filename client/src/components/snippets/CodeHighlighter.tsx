@@ -1,26 +1,7 @@
-import Prism from "prismjs";
-// Ensure correct language import
-// For Theme
-import "prismjs/themes/prism-tomorrow.css";
-// For Code Highlight
-import "prismjs/components/prism-bash.min.js";
-import "prismjs/components/prism-json.min.js";
-import "prismjs/components/prism-markup-templating.min.js";
-import "prismjs/components/prism-markup.min.js";
-import "prismjs/components/prism-markdown.min.js";
-import "prismjs/components/prism-css.min.js";
-import "prismjs/components/prism-scss.min.js";
-import "prismjs/components/prism-sql.min.js";
-import "prismjs/components/prism-go.min.js";
-import "prismjs/components/prism-python.min.js";
-import "prismjs/components/prism-javascript.min.js";
-import "prismjs/components/prism-typescript.min.js";
-import "prismjs/components/prism-markup.min.js";
-import "prismjs/components/prism-php.min.js";
-import "prismjs/components/prism-yaml.min.js";
+import { useEffect, useState } from "react";
+import { codeToHtml } from "shiki";
 import type { ClassValue } from "class-variance-authority/types";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 import { Button } from "../ui/button";
 import { Check, Copy } from "lucide-react";
 
@@ -29,8 +10,8 @@ const languageMap: Record<string, string> = {
   php: "php",
   js: "javascript",
   ts: "typescript",
-  html: "markup",
-  markup: "markup",
+  html: "html",
+  markup: "html",
   yaml: "yaml",
   yml: "yaml",
   json: "json",
@@ -39,6 +20,25 @@ const languageMap: Record<string, string> = {
   sql: "sql",
   go: "go",
   sh: "bash",
+  md: "markdown",
+  rs: "rust",
+  java: "java",
+  kt: "kotlin",
+  rb: "ruby",
+  c: "c",
+  cpp: "cpp",
+  cs: "csharp",
+  swift: "swift",
+  dart: "dart",
+  r: "r",
+  lua: "lua",
+  docker: "dockerfile",
+  tf: "hcl",
+  toml: "toml",
+  xml: "xml",
+  graphql: "graphql",
+  jsx: "jsx",
+  tsx: "tsx",
 };
 
 export default function CodeHighlighter({
@@ -53,6 +53,19 @@ export default function CodeHighlighter({
   className?: ClassValue;
 }) {
   const [copied, setCopied] = useState(false);
+  const [html, setHtml] = useState("");
+
+  const shikiLang = languageMap[language] ?? "plaintext";
+
+  useEffect(() => {
+    codeToHtml(content, {
+      lang: shikiLang,
+      themes: {
+        light: "github-light",
+        dark: "github-dark",
+      },
+    }).then(setHtml);
+  }, [content, shikiLang]);
 
   const handleCopy = async () => {
     try {
@@ -64,10 +77,16 @@ export default function CodeHighlighter({
     }
   };
 
-  const prismLang = languageMap[language] ?? "plaintext";
+  if (!html) {
+    return (
+      <div className={cn("p-4 bg-muted/30 rounded-md", className)}>
+        <pre className="text-sm font-mono whitespace-pre-wrap">{content}</pre>
+      </div>
+    );
+  }
 
   return (
-    <div className="relative">
+    <div className={cn("relative", className)}>
       {showCopyButton && (
         <Button
           variant="ghost"
@@ -82,24 +101,10 @@ export default function CodeHighlighter({
           )}
         </Button>
       )}
-
-      <pre
-        className={cn(
-          `language-${prismLang} p-4 rounded-lg overflow-auto`,
-          className
-        )}
-      >
-        <code
-          className={`language-${prismLang} block`}
-          dangerouslySetInnerHTML={{
-            __html: Prism.highlight(
-              content,
-              Prism.languages[prismLang],
-              language
-            ),
-          }}
-        />
-      </pre>
+      <div
+        className="[&_pre]:!m-0 [&_pre]:p-4 [&_pre]:overflow-auto [&_pre]:text-sm [&_code]:text-sm"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import api from "@/lib/api";
 import { useAuthStore } from "@/store";
-import { useMutation } from "@tanstack/react-query";
-import { AxiosError } from "axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
@@ -16,6 +16,14 @@ interface LogoutFailResponse {
 export const useLogout = () => {
   const { logout, refresh } = useAuthStore();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const handleLogout = () => {
+    navigate("/sign-in", { replace: true });
+    logout();
+    queryClient.clear();
+    toast.success("Logged out successfully", { id: "logout" });
+  };
 
   return useMutation<LogoutResponse, AxiosError<LogoutFailResponse>>({
     mutationFn: async () => {
@@ -24,18 +32,10 @@ export const useLogout = () => {
       });
       return response.data;
     },
-    onSuccess: () => {
-      logout();
-      toast.success("Logout Successful");
-      navigate('/sign-in');
+    onMutate: () => {
+      toast.loading("Logging out...", { id: "logout" });
     },
-    onError: (error) => {
-      if (error.code === "ERR_NETWORK") {
-        toast.error("Network Error: Could not connect to server!");
-        return;
-      }
-      const detail = error.response?.data?.refresh_token ?? "Logout failed!";
-      toast.error(detail);
-    },
+    onSuccess: () => handleLogout(),
+    onError: () => handleLogout(),
   });
 };

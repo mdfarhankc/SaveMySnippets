@@ -6,11 +6,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 
 from .serializers.auth_serializers import (
-    RegisterUserSerializer, MyTokenObtainPairSerializer, LogoutSerializer, UserSerializer
+    RegisterUserSerializer, MyTokenObtainPairSerializer, LogoutSerializer, UserSerializer,
+    UpdateUserSerializer
 )
 from .serializers.password_reset_serializers import (
     PasswordResetRequestSerializer, PasswordResetConfirmSerializer
 )
+from .utils.mail import send_password_reset_email
 
 
 User = get_user_model()
@@ -49,10 +51,14 @@ class LogoutView(generics.GenericAPIView):
         return Response({"detail": "Logout successful"}, status=status.HTTP_204_NO_CONTENT)
 
 
-class AuthUserView(generics.RetrieveAPIView):
-    """Return the authenticated user's data"""
-    serializer_class = UserSerializer
+class AuthUserView(generics.RetrieveUpdateAPIView):
+    """Return or update the authenticated user's data"""
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.request.method in ["PUT", "PATCH"]:
+            return UpdateUserSerializer
+        return UserSerializer
 
     def get_object(self):
         return self.request.user

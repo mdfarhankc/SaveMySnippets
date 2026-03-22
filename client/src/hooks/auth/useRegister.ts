@@ -14,7 +14,7 @@ interface RegisterResponse {
 }
 
 interface RegisterFailResponse {
-    errors: string[];
+    [key: string]: string | string[];
 }
 
 export const useRegister = () => {
@@ -33,20 +33,20 @@ export const useRegister = () => {
                     refresh: data.refresh,
                     authUser: data.user,
                 });
-                toast.success("Account created Successful");
+                toast.success("Account created successfully");
                 navigate('/dashboard');
             },
             onError: (error) => {
                 if (error.code === "ERR_NETWORK") {
-                    toast.error("Network Error: Could not connect to server!");
+                    toast.error("Could not connect to server");
                     return;
                 }
-                const errors = error.response?.data?.errors;
-                if (errors && Array.isArray(errors)) {
-                    errors.forEach((errorMsg) => toast.error(errorMsg));
+                const data = error.response?.data;
+                if (data) {
+                    const messages = Object.values(data).flat();
+                    messages.forEach((msg) => toast.error(String(msg)));
                 } else {
-                    const fallBackMessage = "Registration failed! Please try again.";
-                    toast.error(fallBackMessage);
+                    toast.error("Registration failed, please try again");
                 }
             },
         }

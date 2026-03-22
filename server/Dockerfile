@@ -33,6 +33,9 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Copy application
 COPY . .
 
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
 EXPOSE 8000
 
 CMD ["uv", "run", "gunicorn", "--bind", "0.0.0.0:8000", "--worker-class", "uvicorn.workers.UvicornWorker", "core.asgi:application"]

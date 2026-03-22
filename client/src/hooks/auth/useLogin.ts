@@ -33,12 +33,12 @@ export const useLogin = () => {
           refresh: data.refresh,
           authUser: data.user,
         });
-        toast.success("Login Successful");
+        toast.success("Logged in successfully");
         navigate('/dashboard');
       },
       onError: (error) => {
         if (error.code === "ERR_NETWORK") {
-          toast.error("Network Error: Could not connect to server!");
+          toast.error("Could not connect to server");
           return;
         }
         const message =

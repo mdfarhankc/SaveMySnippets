@@ -59,9 +59,10 @@ class SnippetSerializer(serializers.ModelSerializer):
         many=True, read_only=True, slug_field="name"
     )
     created_by = serializers.CharField(source="user.full_name", read_only=True)
+    user_id = serializers.UUIDField(source="user.id", read_only=True)
 
     class Meta:
         model = Snippet
         fields = [
-            "id", "title", "slug", "description", "content", "is_public", "language", "tags", "created_by", "created_at", "updated_at"
+            "id", "title", "slug", "description", "content", "is_public", "language", "tags", "created_by", "user_id", "created_at", "updated_at"
         ]

@@ -25,7 +25,7 @@ services:
       dockerfile: Dockerfile
     container_name: savemysnippets_server
     env_file:
-      - ./server/.env.production
+      - ./server/.env.docker
     environment:
       DJANGO_DEBUG: True
       DJANGO_SECRET_KEY: ynejknviqenurc638743c7nr2hf7tc3r78t1b83

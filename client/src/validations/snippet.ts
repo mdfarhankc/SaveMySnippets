@@ -3,7 +3,7 @@ import { z } from "zod"
 
 export const createEditSnippetSchema = z.object({
     title: z
-        .string({ required_error: "Title is required!" })
+        .string({ error: "Title is required!" })
         .trim()
         .min(5, "Title should be at least 5 characters.")
         .max(30, "Title must contain at most 30 characters."),
@@ -13,11 +13,11 @@ export const createEditSnippetSchema = z.object({
         .max(160, "Description must be at most 160 characters.")
         .optional(),
     language: z
-        .string({ required_error: "Language is required!" })
+        .string({ error: "Language is required!" })
         .min(1, "Language cannot be empty."),
     is_public: z.boolean().default(false).optional(),
     content: z
-        .string({ required_error: "Content is required!" })
+        .string({ error: "Content is required!" })
         .trim()
         .min(5, "Content should be at least 5 characters."),
     tags: z.array(

@@ -19,14 +19,17 @@ export const useCreateSnippets = (options?: {
             const response = await api.post('/snippets/', values);
             return response.data;
         },
+        onMutate: () => {
+            toast.loading("Creating snippet...", { id: "create-snippet" });
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["user-snippets"] });
-            toast.success("Snippet created successfully!");
+            toast.success("Snippet created successfully", { id: "create-snippet" });
             options?.onSuccess?.();
         },
         onError: (error) => {
-            const message = error?.response?.data?.detail || "Something went wrong.";
-            toast.error(message);
+            const message = error?.response?.data?.detail || "Something went wrong";
+            toast.error(message, { id: "create-snippet" });
         },
     })
 }

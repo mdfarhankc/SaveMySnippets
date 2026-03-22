@@ -16,7 +16,7 @@ export default function Logo({
       className={cn("flex items-center gap-2 text-xl font-bold", className)}
     >
       <Code className={cn("h-6 w-6 text-primary", iconClassName)} />
-      <h1>SaveMySnippet</h1>
+      <h1>SaveMySnippets</h1>
     </Link>
   );
 }

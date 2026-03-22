@@ -21,8 +21,11 @@ import { Input } from "@/components/ui/input";
 import { Link } from "react-router";
 import LoadingButton from "@/components/common/LoadingButton";
 import { useRegister } from "@/hooks/auth/useRegister";
+import { Code, UserPlus } from "lucide-react";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export default function RegisterPage() {
+  usePageTitle("Sign Up");
   const { mutate: register, isPending } = useRegister();
   const form = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
@@ -38,13 +41,21 @@ export default function RegisterPage() {
   async function onSubmit(values: RegisterValues) {
     register(values);
   }
+
   return (
     <main className="flex-1 flex">
-      <section className="max-w-7xl mx-auto container flex justify-center items-center flex-1">
-        <Card className="max-w-xl w-md">
-          <CardHeader>
-            <CardTitle className="text-3xl font-bold">Register</CardTitle>
-            <CardDescription>Create a new account</CardDescription>
+      <section className="max-w-7xl mx-auto container flex justify-center items-center flex-1 px-4">
+        <Card className="w-full max-w-md border-border/50 shadow-lg gap-4">
+          <CardHeader className="text-center pb-2">
+            <div className="flex justify-center mb-3">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <Code className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+            <CardDescription className="text-base">
+              Get started with SaveMySnippet for free
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -52,17 +63,18 @@ export default function RegisterPage() {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-4"
               >
-                <div className="flex items-center justify-between">
+                <div className="grid grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
                     name="first_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Firstname</FormLabel>
+                        <FormLabel>First Name</FormLabel>
                         <FormControl>
                           <Input
                             disabled={isPending}
                             placeholder="John"
+                            className="h-10"
                             {...field}
                           />
                         </FormControl>
@@ -75,11 +87,12 @@ export default function RegisterPage() {
                     name="last_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Lastname</FormLabel>
+                        <FormLabel>Last Name</FormLabel>
                         <FormControl>
                           <Input
                             disabled={isPending}
                             placeholder="Doe"
+                            className="h-10"
                             {...field}
                           />
                         </FormControl>
@@ -99,6 +112,7 @@ export default function RegisterPage() {
                           disabled={isPending}
                           type="email"
                           placeholder="johndoe@gmail.com"
+                          className="h-10"
                           {...field}
                         />
                       </FormControl>
@@ -116,6 +130,7 @@ export default function RegisterPage() {
                         <Input
                           disabled={isPending}
                           type="password"
+                          className="h-10"
                           {...field}
                         />
                       </FormControl>
@@ -133,6 +148,7 @@ export default function RegisterPage() {
                         <Input
                           disabled={isPending}
                           type="password"
+                          className="h-10"
                           {...field}
                         />
                       </FormControl>
@@ -141,20 +157,23 @@ export default function RegisterPage() {
                   )}
                 />
                 <LoadingButton
-                  className="w-full cursor-pointer"
+                  className="w-full cursor-pointer h-10 mt-2"
                   type="submit"
                   isLoading={isPending}
                 >
-                  Register
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Create Account
                 </LoadingButton>
               </form>
             </Form>
           </CardContent>
-          <CardFooter>
-            <div className="flex items-center justify-center gap-2">
-              <span>Already have an account?</span>
-              <Link to={"/sign-in"} className="text-primary">Login</Link>
-            </div>
+          <CardFooter className="justify-center border-t pt-4">
+            <p className="text-sm text-muted-foreground">
+              Already have an account?{" "}
+              <Link to="/sign-in" className="text-primary font-medium hover:underline">
+                Sign in
+              </Link>
+            </p>
           </CardFooter>
         </Card>
       </section>

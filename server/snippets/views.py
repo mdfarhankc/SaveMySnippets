@@ -2,6 +2,7 @@ from rest_framework import generics, permissions, filters, status
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from drf_spectacular.utils import extend_schema
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Snippet, Language
 from .serializers import (
@@ -18,8 +19,14 @@ class SnippetListCreateView(generics.ListCreateAPIView):
     serializer_class = CreateOrUpdateSnippetSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
     search_fields = ["title", "content"]
+    ordering_fields = ["created_at", "updated_at", "title"]
+    ordering = ["-created_at"]
+    filterset_fields = {
+        "language__name": ["exact"],
+        "tags__name": ["exact"],
+    }
 
     def get_serializer_class(self):
         if self.request.method == "GET":
@@ -62,6 +69,14 @@ class UserSnippetsView(generics.ListAPIView):
     """ Get current users snippets. """
     serializer_class = SnippetSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
+    search_fields = ["title", "content"]
+    ordering_fields = ["created_at", "updated_at", "title"]
+    ordering = ["-created_at"]
+    filterset_fields = {
+        "language__name": ["exact"],
+        "tags__name": ["exact"],
+    }
 
     def get_queryset(self):
         return Snippet.objects.filter(user=self.request.user)
@@ -75,3 +90,11 @@ class ListLanguagesView(generics.ListAPIView):
     serializer_class = LanguageSerializer
     permission_classes = [permissions.AllowAny]
     pagination_class = None
+
+
+@extend_schema(tags=["Languages"], description="Create a new language (admin only)")
+class CreateLanguageView(generics.CreateAPIView):
+    """ Create a new language. Admin only. """
+    queryset = Language.objects.all()
+    serializer_class = LanguageSerializer
+    permission_classes = [permissions.IsAdminUser]

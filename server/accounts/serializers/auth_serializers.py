@@ -30,6 +30,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             'first_name': self.user.first_name,
             'last_name': self.user.last_name,
             'full_name': self.user.get_full_name(),
+            'is_staff': self.user.is_staff,
         }
         return data
 
@@ -43,10 +44,17 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         model = User
         fields = ["email", "first_name", "last_name",
                   "password", "confirm_password"]
+        extra_kwargs = {
+            "email": {
+                "error_messages": {
+                    "unique": _("An account with this email already exists"),
+                }
+            }
+        }
 
     def validate(self, attrs):
         if attrs["password"] != attrs["confirm_password"]:
-            raise serializers.ValidationError(_("Passwords doesnt match!"))
+            raise serializers.ValidationError(_("Passwords do not match"))
         return attrs
 
     def create(self, validated_data):
@@ -77,7 +85,19 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "email", "first_name",
-                  "last_name", "full_name", "is_active"]
+                  "last_name", "full_name", "is_active", "is_staff"]
+
+    def get_full_name(self, obj):
+        return f"{obj.first_name} {obj.last_name}".strip()
+
+
+class UpdateUserSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ["id", "email", "first_name", "last_name", "full_name"]
+        read_only_fields = ["id", "email"]
 
     def get_full_name(self, obj):
         return f"{obj.first_name} {obj.last_name}".strip()

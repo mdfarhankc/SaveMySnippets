@@ -25,27 +25,30 @@ api.interceptors.response.use(
         if (status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
 
+            const { refresh, login, logout } = useAuthStore.getState();
+
+            // No refresh token — force logout
+            if (!refresh) {
+                logout();
+                return Promise.reject(error);
+            }
+
             try {
-                const { refresh, login } = useAuthStore.getState();
-                if (refresh) {
-                    const res = await axios.post(`${api.defaults.baseURL}/auth/token/refresh/`, {
-                        refresh,
-                    });
+                const res = await axios.post(`${api.defaults.baseURL}/auth/token/refresh/`, {
+                    refresh,
+                });
 
-                    const { access } = res.data;
-                    const user = useAuthStore.getState().authUser;
+                const { access } = res.data;
+                const user = useAuthStore.getState().authUser;
 
-                    login({ access, refresh: refresh!, authUser: user! });
+                login({ access, refresh, authUser: user! });
 
-                    // Update Authorization header and retry request
-                    originalRequest.headers.Authorization = `Bearer ${access}`;
-                }
-
+                // Update Authorization header and retry request
+                originalRequest.headers.Authorization = `Bearer ${access}`;
                 return api(originalRequest);
             } catch (refreshError) {
-                console.error("Error in API Refresh: ", refreshError)
                 // Refresh failed, force logout
-                useAuthStore.getState().logout();
+                logout();
                 return Promise.reject(refreshError);
             }
         }

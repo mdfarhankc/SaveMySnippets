@@ -8,28 +8,27 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLogout } from "@/hooks/auth/useLogout";
-import Loading from "@/components/common/Loading";
-import { LayoutDashboard, LogOut } from "lucide-react";
+import { LayoutDashboard, LogOut, Shield, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuthStore } from "@/store";
 import { Link } from "react-router";
 
 export default function UserButton() {
-  const { mutate: logout, isPending } = useLogout();
+  const { mutate: logout } = useLogout();
   const { authUser } = useAuthStore();
-  const imageSrc = `https://avatar.iran.liara.run/public?username=${authUser?.full_name}`;
+  const displayName = authUser?.full_name || authUser?.email || "User";
+  const initials = (authUser?.full_name || authUser?.email || "U").toUpperCase().slice(0, 2);
+  const imageSrc = `https://avatar.iran.liara.run/public?username=${displayName}`;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="cursor-pointer">
         <Avatar>
           <AvatarImage src={imageSrc} />
-          <AvatarFallback>
-            {authUser?.full_name.toUpperCase().slice(0, 2)}
-          </AvatarFallback>
+          <AvatarFallback>{initials}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
-        <DropdownMenuLabel>{authUser?.full_name}</DropdownMenuLabel>
+        <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem className="cursor-pointer" asChild>
@@ -37,16 +36,27 @@ export default function UserButton() {
               <LayoutDashboard className="w-6 h-6" /> Dashboard
             </Link>
           </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer" asChild>
+            <Link to={"/profile"}>
+              <User className="w-6 h-6" /> Profile
+            </Link>
+          </DropdownMenuItem>
         </DropdownMenuGroup>
+        {authUser?.is_staff && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem className="cursor-pointer" asChild>
+                <Link to="/admin">
+                  <Shield className="w-6 h-6" /> Admin Dashboard
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem className="cursor-pointer" onClick={() => logout()}>
-          {isPending ? (
-            <Loading />
-          ) : (
-            <span className="flex items-center gap-1">
-              <LogOut className="w-6 h-6" /> Logout
-            </span>
-          )}
+          <LogOut className="w-6 h-6" /> Logout
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

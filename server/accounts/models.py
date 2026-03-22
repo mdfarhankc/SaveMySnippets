@@ -22,7 +22,11 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    email = models.EmailField(_("Email address"), unique=True)
+    email = models.EmailField(
+        _("Email address"),
+        unique=True,
+        error_messages={"unique": _("An account with this email already exists")},
+    )
     username = models.CharField(
         _("Username"), max_length=150, null=True, blank=True)
 

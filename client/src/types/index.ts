@@ -11,6 +11,7 @@ export interface User {
     first_name: string;
     last_name: string;
     is_active: boolean;
+    is_staff: boolean;
 }
 
 export interface Lanugage {
@@ -29,6 +30,7 @@ export interface Snippet {
     language: Lanugage;
     tags: Array<string>;
     created_by: string;
+    user_id: string;
     created_at: string;
     updated_at: string;
 }

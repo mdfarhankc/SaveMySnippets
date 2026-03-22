@@ -1,96 +1,83 @@
-# 🧠 SaveMySnippet
+# SaveMySnippets
 
-**SaveMySnippet** is a full-stack web application that allows developers to save, edit, and manage code snippets in multiple programming languages with syntax highlighting, tagging, visibility control (public/private), and an intuitive UI.
+A full-stack code snippet manager built with Django REST Framework and React. Save, organize, search, and share code snippets with syntax highlighting, tagging, and visibility control.
 
----
+## Tech Stack
 
-## 📁 Project Structure
+**Frontend:** React 19, TypeScript, Vite, Tailwind CSS v4, ShadCN/Radix UI, Zustand, TanStack React Query, React Hook Form + Zod, Shiki (syntax highlighting)
 
-SaveMySnippet/
-├── backend/ # Django project (REST API)
-│ ├── manage.py
-│ └── save_my_snippet/ # Core app
-│ └── ...
-├── frontend/ # React (Vite + TypeScript) app
-│ ├── index.html
-│ └── src/
-│ └── ...
-└── README.md
+**Backend:** Django 5.2, Django REST Framework, SimpleJWT, PostgreSQL (Neon), django-filter
 
----
+**Deployment:** Render (backend), Vercel (frontend)
 
-## 🧰 Tech Stack
+## Features
 
-### 🖥 Frontend
+- JWT authentication with token refresh and blacklisting
+- Create, edit, delete, duplicate, and download code snippets
+- Syntax highlighting with Shiki (200+ languages, dual light/dark themes)
+- Public/private visibility control
+- Search, sort (date, title), and filter (language, tags)
+- Password reset flow with email
+- User profile management
+- Admin dashboard for managing languages
+- Infinite scroll pagination
+- Mobile-responsive with hamburger menu
+- Dark/light theme toggle
 
-- **React 19** (Vite + TypeScript)
-- **Tailwind CSS**
-- **ShadCN UI**
-- **React Router v7**
-- **Zustand** (state management)
-- **TanStack Query** (data fetching/caching)
-- **Axios** (API calls)
-- **React Hook Form + Zod** (forms & validation)
-- **Prism.js / shiki** (syntax highlighting)
-
-### 🛠 Backend
-
-- **Django 5.2**
-- **Django REST Framework**
-- **Simple JWT** (authentication)
-- **CORS Headers**
-- **PostgreSQL** (or SQLite)
-
----
-
-## 🚀 Features
-
-- 🔐 **User Authentication** (JWT-based)
-- 💾 **Create, View, Edit, Delete Snippets**
-- 🧠 **Syntax Highlighting** (based on language extension)
-- 🏷️ **Tag Support** (display & future filtering)
-- 🌍 **Public/Private Visibility** Control
-- ✨ **Inline Editing** on Snippet Detail Page
-- ⚡ Fast UI with Suspense-based loading states
-
----
-
-## 🧑‍💻 Local Development
-
-### Backend Setup
-
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # Or `venv\Scripts\activate` on Windows
-pip install -r requirements.txt
-
-# Apply migrations and run server
-python manage.py migrate
-python manage.py runserver
-```
-
-## Frontend Setup
-
-```bash
-cd frontend
-npm install
-npm run dev
+## Project Structure
 
 ```
+SaveMySnippets/
+├── client/          # React frontend (Vite)
+├── server/          # Django backend (DRF)
+├── docker-compose.yaml
+└── render.yaml      # Render deployment config
+```
+
+## Local Development
+
+### Prerequisites
+
+- Python 3.10+
+- Node.js 18+
+- PostgreSQL (or Neon account)
+- [uv](https://docs.astral.sh/uv/) package manager
+
+### Backend
+
+```bash
+cd server
+cp .env.example .env          # Fill in your database credentials
+uv sync                       # Install dependencies
+python manage.py migrate      # Run migrations
+python manage.py createsuperuser --noinput  # Create admin from .env
+python manage.py runserver    # Start on :8000
+```
+
+### Frontend
+
+```bash
+cd client
+cp .env.example .env          # Set VITE_BACKEND_URL
+npm install                   # Install dependencies
+npm run dev                   # Start on :5173
+```
+
+### Docker (PostgreSQL + Backend)
+
+```bash
+docker-compose up --build     # Starts PostgreSQL + Django on :8000
+```
+
+## API Documentation
+
+Available at `/api/docs/swagger/` and `/api/docs/redoc/` when `DEBUG=True`.
 
 ## Deployment
 
-### Build frontend:
+- **Backend (Render):** Uses `render.yaml` blueprint. Connect repo, fill env vars, deploy.
+- **Frontend (Vercel):** Connect repo, set root directory to `client`, deploy. SPA routing handled by `vercel.json`.
 
-```bash
-npm run build
+## License
 
-```
-
-### Collect Django static files:
-
-```bash
-python manage.py collectstatic
-
-```
+MIT

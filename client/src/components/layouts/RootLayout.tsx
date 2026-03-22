@@ -4,25 +4,20 @@ import { Toaster } from "../ui/sonner";
 import { useAuthUser } from "@/hooks/auth/useAuthUser";
 import { useEffect } from "react";
 import { useAuthStore } from "@/store";
-import Loading from "../common/Loading";
 
 export default function RootLayout() {
-  const { authUser, isPending, isError } = useAuthUser();
-  const setAuthUser = useAuthStore((s) => s.setAuthUser);
+  const access = useAuthStore((s) => s.access);
+  const { authUser, isError } = useAuthUser();
+  const { setAuthUser, logout } = useAuthStore();
 
   useEffect(() => {
-    if (authUser && !isPending && !isError) {
+    if (authUser) {
       setAuthUser(authUser);
     }
-  }, [isPending, isError, authUser, setAuthUser]);
-
-  if (isPending && !isError) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loading />
-      </div>
-    );
-  }
+    if (isError && access) {
+      logout();
+    }
+  }, [isError, authUser, setAuthUser, logout, access]);
 
   return (
     <div className="flex flex-col min-h-screen">
