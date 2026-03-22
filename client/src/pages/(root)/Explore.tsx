@@ -4,6 +4,13 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useGetPublicSnippets } from "@/hooks/snippets/useGetPublicSnippets";
 import { useGetLanguages } from "@/hooks/languages/useGetLanguages";
 import { Search } from "lucide-react";
@@ -23,14 +30,14 @@ export default function ExplorePage() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [ordering, setOrdering] = useState("-created_at");
-  const [language, setLanguage] = useState("");
+  const [language, setLanguage] = useState("all");
   const { languages } = useGetLanguages();
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useGetPublicSnippets({
       search: debouncedSearch,
       ordering,
-      language: language || undefined,
+      language: language === "all" ? undefined : language,
     });
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -72,25 +79,31 @@ export default function ExplorePage() {
               className="pl-9 h-9"
             />
           </div>
-          <select
-            value={ordering}
-            onChange={(e) => setOrdering(e.target.value)}
-            className="h-9 px-3 rounded-md border border-input bg-background text-sm cursor-pointer"
-          >
-            {SORT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-          <select
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            className="h-9 px-3 rounded-md border border-input bg-background text-sm cursor-pointer"
-          >
-            <option value="">All Languages</option>
-            {languages.map((lang) => (
-              <option key={lang.id} value={lang.name}>{lang.name}</option>
-            ))}
-          </select>
+          <Select value={ordering} onValueChange={setOrdering}>
+            <SelectTrigger className="w-44 h-9">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {SORT_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={language} onValueChange={setLanguage}>
+            <SelectTrigger className="w-40 h-9">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Languages</SelectItem>
+              {languages.map((lang) => (
+                <SelectItem key={lang.id} value={lang.name}>
+                  {lang.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </section>
       <Separator />
@@ -114,7 +127,7 @@ export default function ExplorePage() {
             </div>
           ) : snippets.length === 0 ? (
             <p className="text-muted-foreground">
-              {debouncedSearch || language
+              {debouncedSearch || language !== "all"
                 ? "No snippets match your filters."
                 : "No public snippets available."}
             </p>

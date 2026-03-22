@@ -24,6 +24,9 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         data = super().validate(attrs)
+        if not self.user.is_verified:
+            raise serializers.ValidationError(
+                _("Please verify your email address before logging in"))
         data['user'] = {
             'id': str(self.user.id),
             'email': self.user.email,

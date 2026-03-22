@@ -16,6 +16,7 @@ import ProfilePage from "@/pages/(main)/Profile";
 import CreateSnippetPage from "@/pages/(main)/CreateSnippetPage";
 import AdminDashboardPage from "@/pages/(main)/AdminDashboard";
 import NotFoundPage from "@/pages/NotFound";
+import VerifyEmailPage from "@/pages/(auth)/VerifyEmail";
 
 export const router = createBrowserRouter([
   {
@@ -41,6 +42,11 @@ export const router = createBrowserRouter([
       {
         path: "/snippet/:slug",
         element: <SnippetDetailPage />,
+      },
+      // Email verification (accessible without auth)
+      {
+        path: "/verify-email",
+        element: <VerifyEmailPage />,
       },
       //   Auth Pages
       {

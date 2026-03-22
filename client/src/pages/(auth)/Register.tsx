@@ -21,12 +21,18 @@ import { Input } from "@/components/ui/input";
 import { Link } from "react-router";
 import LoadingButton from "@/components/common/LoadingButton";
 import { useRegister } from "@/hooks/auth/useRegister";
-import { Code, UserPlus } from "lucide-react";
+import { useResendVerification } from "@/hooks/auth/useVerifyEmail";
+import { Code, Mail, UserPlus } from "lucide-react";
 import { usePageTitle } from "@/hooks/usePageTitle";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function RegisterPage() {
   usePageTitle("Sign Up");
-  const { mutate: register, isPending } = useRegister();
+  const { mutate: register, isPending, isSuccess } = useRegister();
+  const { mutate: resend, isPending: isResending } = useResendVerification();
+  const [registeredEmail, setRegisteredEmail] = useState("");
+
   const form = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -38,8 +44,53 @@ export default function RegisterPage() {
     },
   });
 
-  async function onSubmit(values: RegisterValues) {
+  function onSubmit(values: RegisterValues) {
+    setRegisteredEmail(values.email);
     register(values);
+  }
+
+  if (isSuccess) {
+    return (
+      <main className="flex-1 flex">
+        <section className="max-w-7xl mx-auto container flex justify-center items-center flex-1 px-4">
+          <Card className="w-full max-w-md border-border/50 shadow-lg">
+            <CardHeader className="text-center">
+              <div className="flex justify-center mb-3">
+                <div className="bg-primary/10 p-3 rounded-full">
+                  <Mail className="h-8 w-8 text-primary" />
+                </div>
+              </div>
+              <CardTitle className="text-2xl font-bold">Check your email</CardTitle>
+              <CardDescription className="text-base">
+                We've sent a verification link to{" "}
+                <span className="font-medium text-foreground">{registeredEmail}</span>
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Click the link in the email to verify your account. The link expires in 24 hours.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={isResending}
+                onClick={() => resend({ email: registeredEmail })}
+              >
+                {isResending ? "Sending..." : "Resend verification email"}
+              </Button>
+            </CardContent>
+            <CardFooter className="justify-center border-t pt-4">
+              <p className="text-sm text-muted-foreground">
+                Already verified?{" "}
+                <Link to="/sign-in" className="text-primary font-medium hover:underline">
+                  Sign in
+                </Link>
+              </p>
+            </CardFooter>
+          </Card>
+        </section>
+      </main>
+    );
   }
 
   return (
@@ -54,7 +105,7 @@ export default function RegisterPage() {
             </div>
             <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
             <CardDescription className="text-base">
-              Get started with SaveMySnippet for free
+              Get started with SaveMySnippets for free
             </CardDescription>
           </CardHeader>
           <CardContent>

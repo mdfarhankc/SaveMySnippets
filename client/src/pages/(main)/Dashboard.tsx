@@ -4,6 +4,13 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Plus } from "lucide-react";
 import { Link } from "react-router";
 import { useGetUserSnippets } from "@/hooks/snippets/useGetUserSnippets";
@@ -27,7 +34,7 @@ export default function DashboardPage() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [ordering, setOrdering] = useState("-created_at");
-  const [language, setLanguage] = useState("");
+  const [language, setLanguage] = useState("all");
   const { languages } = useGetLanguages();
 
   const {
@@ -40,7 +47,7 @@ export default function DashboardPage() {
   } = useGetUserSnippets({
     search: debouncedSearch,
     ordering,
-    language: language || undefined,
+    language: language === "all" ? undefined : language,
   });
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -100,25 +107,31 @@ export default function DashboardPage() {
               className="pl-9 h-9"
             />
           </div>
-          <select
-            value={ordering}
-            onChange={(e) => setOrdering(e.target.value)}
-            className="h-9 px-3 rounded-md border border-input bg-background text-sm cursor-pointer"
-          >
-            {SORT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-          <select
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            className="h-9 px-3 rounded-md border border-input bg-background text-sm cursor-pointer"
-          >
-            <option value="">All Languages</option>
-            {languages.map((lang) => (
-              <option key={lang.id} value={lang.name}>{lang.name}</option>
-            ))}
-          </select>
+          <Select value={ordering} onValueChange={setOrdering}>
+            <SelectTrigger className="w-44 h-9">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {SORT_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={language} onValueChange={setLanguage}>
+            <SelectTrigger className="w-40 h-9">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Languages</SelectItem>
+              {languages.map((lang) => (
+                <SelectItem key={lang.id} value={lang.name}>
+                  {lang.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </section>
       <Separator />
